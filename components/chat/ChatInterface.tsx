@@ -10,7 +10,7 @@ import { ToolsDisplay } from "@/components/chat/ToolsDisplay";
 import { useToast } from "@/hooks/use-toast";
 import { AnimatedLoadingDots } from "@/components/ui/animated-loading-dots";
 import { ApiKeyDialog } from "@/components/chat/ApiKeyDialog";
-import { useApiKeys } from "@/lib/api-keys";
+// import { useApiKeys } from "@/lib/api-keys";
 
 // Message type definition
 type Message = {
@@ -57,7 +57,7 @@ export default function ChatInterface({
   );
   const [isRecording, setIsRecording] = useState(false);
   const [showApiKeyDialog, setShowApiKeyDialog] = useState(false);
-  const { apiKeys, getApiKey } = useApiKeys();
+  // const { apiKeys, getApiKey } = useApiKeys();
 
   const { toast } = useToast();
   const endOfMessagesRef = useRef<HTMLDivElement>(null);
@@ -92,14 +92,14 @@ export default function ChatInterface({
   }, [isLoading]);
 
   // Check if API key is available for the selected model
-  useEffect(() => {
-    if (selectedModel !== "ollama") {
-      const apiKey = getApiKey(selectedModel);
-      if (!apiKey) {
-        setShowApiKeyDialog(true);
-      }
-    }
-  }, [selectedModel, getApiKey]);
+  // useEffect(() => {
+  //   if (selectedModel !== "ollama") {
+  //     const apiKey = getApiKey(selectedModel);
+  //     if (!apiKey) {
+  //       setShowApiKeyDialog(true);
+  //     }
+  //   }
+  // }, [selectedModel, getApiKey]);
 
   const handleSendMessage = async () => {
     if (input.trim() === "" || isLoading) return;
@@ -113,20 +113,13 @@ export default function ChatInterface({
       return;
     }
 
-    // Check if Ollama is selected (not available)
+    // ensure that
     if (selectedModel !== "claude") {
       toast({
         title: "Model Not Available",
         description: "Support for this model is not yet available.",
         variant: "destructive",
       });
-      return;
-    }
-
-    // Check if API key is available
-    const apiKey = getApiKey(selectedModel);
-    if (!apiKey && selectedModel !== "ollama") {
-      setShowApiKeyDialog(true);
       return;
     }
 
@@ -154,13 +147,15 @@ export default function ChatInterface({
       }
 
       const data = await response.json();
-
+      console.log(`retrieved data : ${JSON.stringify(data)}`);
       // Check if the response contains tools information
       const toolsUsed = data.tools || [];
 
       const assistantMessage: Message = {
         role: "assistant",
-        content: data.response || "I'm sorry, I couldn't generate a response.",
+        content:
+          data["final_response"] ||
+          "I'm sorry, I couldn't generate a response.",
         tools: toolsUsed.length > 0 ? toolsUsed : undefined,
       };
 
@@ -186,6 +181,10 @@ export default function ChatInterface({
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    console.log(`current selected model : ${selectedModel}`);
+  });
 
   const startRecording = async () => {
     try {

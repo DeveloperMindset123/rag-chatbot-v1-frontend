@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Check, ChevronDown, CircuitBoard, ChevronsUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,7 +16,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { useApiKeys } from "@/lib/api-keys";
+// import { useApiKeys } from "@/lib/api-keys";
 
 const models = [
   {
@@ -104,10 +104,14 @@ export default function ModelSelector({
   onSelectModel,
 }: ModelSelectorProps) {
   const [open, setOpen] = useState(false);
-  const { getApiKey } = useApiKeys();
+  // const { getApiKey } = useApiKeys();
 
   const currentModel = models.find((model) => model.value === selectedModel);
   // const currentModel = "openai";
+
+  useEffect(() => {
+    console.log(`Changed model to : ${selectedModel}`);
+  }, [selectedModel]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -132,8 +136,7 @@ export default function ModelSelector({
           <CommandEmpty>No model found.</CommandEmpty>
           <CommandGroup>
             {models.map((model) => {
-              const hasApiKey =
-                model.value === "ollama" || !!getApiKey(model.value);
+              const hasApiKey = model.value === "ollama" || "";
 
               return (
                 <CommandItem
@@ -153,11 +156,11 @@ export default function ModelSelector({
                     <span>{model.label}</span>
                   </div>
 
-                  {!hasApiKey && (
+                  {/* {!hasApiKey && (
                     <span className="text-xs text-muted-foreground">
                       Missing API Key
                     </span>
-                  )}
+                  )} */}
 
                   <Check
                     className={cn(

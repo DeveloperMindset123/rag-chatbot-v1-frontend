@@ -16,7 +16,7 @@ export default function ChatPage() {
   const [serverStatus, setServerStatus] = useState<
     "online" | "offline" | "checking"
   >("checking");
-  const [selectedModel, setSelectedModel] = useState("openai");
+  const [selectedModel, setSelectedModel] = useState("claude");
 
   useEffect(() => {
     // Check if the server is running
@@ -86,7 +86,7 @@ export default function ChatPage() {
 
       {/* Main Content */}
       <main className="flex-1 overflow-hidden">
-        <ChatInterface selectedModel={"openai"} serverStatus={"online"} />
+        <ChatInterface selectedModel={selectedModel} serverStatus={"online"} />
       </main>
     </div>
   );
