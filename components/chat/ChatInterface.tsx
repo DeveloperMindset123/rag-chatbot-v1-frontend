@@ -10,13 +10,17 @@ import { ToolsDisplay } from "@/components/chat/ToolsDisplay";
 import { useToast } from "@/hooks/use-toast";
 import { AnimatedLoadingDots } from "@/components/ui/animated-loading-dots";
 import { ApiKeyDialog } from "@/components/chat/ApiKeyDialog";
-// import { useApiKeys } from "@/lib/api-keys";
+import { remark } from "remark";
+import html from "remark-html";
+import remarkGfm from "remark-gfm";
+import path from "path";
 
 // Message type definition
 type Message = {
   role: "user" | "assistant";
   content: string;
   tools?: any[];
+  processedContent?: string; // Add this to store processed markdown HTML
 };
 
 type LoadingMessage =
@@ -36,6 +40,19 @@ const loadingMessages: LoadingMessage[] = [
   "Generating response...",
 ];
 
+// Utility function to convert markdown to HTML
+async function markdownToHtml(markdown: string) {
+  // First, remove any literal '**' characters that weren't processed
+  const cleanedMarkdown = markdown.replace(/\\\*\*/g, "");
+
+  const result = await remark()
+    .use(html)
+    .use(remarkGfm) // Add GitHub Flavored Markdown support
+    .process(cleanedMarkdown);
+
+  return result.toString();
+}
+
 export default function ChatInterface({
   selectedModel,
   serverStatus,
@@ -43,6 +60,11 @@ export default function ChatInterface({
   selectedModel: string;
   serverStatus: "online" | "offline" | "checking";
 }) {
+  const markdownDataFilePath = path.join(
+    process.cwd(),
+    "markdown/llm_response.md"
+  );
+
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
@@ -64,6 +86,25 @@ export default function ChatInterface({
   const audioChunksRef = useRef<Blob[]>([]);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const loadingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Process markdown content for existing messages
+  useEffect(() => {
+    const processMarkdown = async () => {
+      const updatedMessages = await Promise.all(
+        messages.map(async (message) => {
+          if (message.role === "assistant" && !message.processedContent) {
+            // Clean and process content
+            const htmlContent = await markdownToHtml(message.content);
+            return { ...message, processedContent: htmlContent };
+          }
+          return message;
+        })
+      );
+      setMessages(updatedMessages);
+    };
+
+    processMarkdown();
+  }, []);
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -90,16 +131,6 @@ export default function ChatInterface({
       }
     };
   }, [isLoading]);
-
-  // Check if API key is available for the selected model
-  // useEffect(() => {
-  //   if (selectedModel !== "ollama") {
-  //     const apiKey = getApiKey(selectedModel);
-  //     if (!apiKey) {
-  //       setShowApiKeyDialog(true);
-  //     }
-  //   }
-  // }, [selectedModel, getApiKey]);
 
   const handleSendMessage = async () => {
     if (input.trim() === "" || isLoading) return;
@@ -147,7 +178,11 @@ export default function ChatInterface({
       }
 
       const data = await response.json();
-      console.log(`retrieved data : ${JSON.stringify(data)}`);
+      // Process markdown to HTML
+      const processedContent = await markdownToHtml(
+        data["final_response"] || ""
+      );
+
       // Check if the response contains tools information
       const toolsUsed = data.tools || [];
 
@@ -156,6 +191,7 @@ export default function ChatInterface({
         content:
           data["final_response"] ||
           "I'm sorry, I couldn't generate a response.",
+        processedContent: processedContent,
         tools: toolsUsed.length > 0 ? toolsUsed : undefined,
       };
 
@@ -181,10 +217,6 @@ export default function ChatInterface({
       setIsLoading(false);
     }
   };
-
-  useEffect(() => {
-    console.log(`current selected model : ${selectedModel}`);
-  });
 
   const startRecording = async () => {
     try {
@@ -272,7 +304,7 @@ export default function ChatInterface({
   return (
     <div className="flex flex-col h-full">
       {/* Messages Area */}
-      <ScrollArea className="flex-1 p-4">
+      <ScrollArea className="overflow-y-auto overflow-x-hidden px-4 py-2 grow max-h-[calc(100vh-120px)]">
         <div className="flex flex-col space-y-4 max-w-3xl mx-auto">
           {messages.map((message, index) => (
             <MessageBubble

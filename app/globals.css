@@ -80,3 +80,73 @@
     @apply bg-background text-foreground;
   }
 }
+
+
+/* This CSS should be added to your global.css file or a similar stylesheet */
+
+/* Ensure markdown content is properly styled */
+.prose {
+  width: 100%;
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  /* hyphens: auto; */
+}
+
+/* Modify Tailwind Typography for better chat display */
+.prose img {
+  max-width: 100%;
+  height: auto;
+  margin: 1rem 0;
+}
+
+/* Ensure all elements stay within their container */
+.prose pre {
+  max-width: 100%;
+  white-space: pre-wrap;
+  overflow-x: auto;
+  padding: 1rem;
+}
+
+.prose code {
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* Increase font size for better readability */
+.prose-base {
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* Ensure tables don't overflow */
+.prose table {
+  max-width: 100%;
+  display: block;
+  overflow-x: auto;
+}
+
+/* Fix list spacing */
+.prose ul, .prose ol {
+  padding-left: 1.5rem;
+}
+
+/* Override any Tailwind Typography defaults that cause overflow */
+.prose * {
+  max-width: 100% !important;
+}
+
+/* Ensure links break properly */
+.prose a {
+  word-break: break-all;
+}
+
+/* Fix blockquote styling */
+.prose blockquote {
+  font-style: italic;
+  border-left: 4px solid #e5e7eb;
+  padding-left: 1rem;
+  margin-left: 0;
+  margin-right: 0;
+}

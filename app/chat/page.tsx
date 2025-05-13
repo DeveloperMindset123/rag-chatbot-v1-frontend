@@ -22,7 +22,6 @@ export default function ChatPage() {
     // Check if the server is running
     const checkServerStatus = async () => {
       try {
-        // TODO : fix needed
         const response = await fetch("http://localhost:8000/ping", {
           method: "GET",
           headers: {
@@ -53,7 +52,7 @@ export default function ChatPage() {
     };
 
     checkServerStatus();
-    // Poll server status every 60 seconds
+    // Poll server status every 600 seconds
     const interval = setInterval(checkServerStatus, 600000);
 
     return () => clearInterval(interval);
@@ -72,7 +71,7 @@ export default function ChatPage() {
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>
-          <h1 className="text-xl font-semibold">AI Assistant</h1>
+          <h1 className="text-xl font-semibold"></h1>
         </div>
         <div className="flex items-center gap-4">
           <ServerStatus status={serverStatus} />
@@ -85,7 +84,7 @@ export default function ChatPage() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-hidden">
+      <main className="flex-1 overflow-hidden h-screen">
         <ChatInterface selectedModel={selectedModel} serverStatus={"online"} />
       </main>
     </div>

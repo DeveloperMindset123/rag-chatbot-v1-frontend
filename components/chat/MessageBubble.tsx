@@ -1,71 +1,55 @@
-"use client";
-
 import React from "react";
-import { User, Bot } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { ToolsDisplay } from "@/components/chat/ToolsDisplay";
-import { motion } from "@/lib/framer-motion";
 
 type MessageBubbleProps = {
   message: {
-    role: "user" | "assistant";
+    role: string;
     content: string;
+    processedContent?: string;
     tools?: any[];
   };
-  isLatestAssistantMessage?: boolean;
+  isLatestAssistantMessage: boolean;
 };
 
-export default function MessageBubble({ 
-  message, 
-  isLatestAssistantMessage = false 
-}: MessageBubbleProps) {
-  const isUser = message.role === "user";
-  
+const MessageBubble: React.FC<MessageBubbleProps> = ({
+  message,
+  isLatestAssistantMessage,
+}) => {
+  const isAssistant = message.role === "assistant";
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className={cn(
-        "flex items-start space-x-2 sm:space-x-4",
-        isUser ? "justify-end" : "justify-start"
-      )}
-    >
-      {!isUser && (
-        <div className="flex-shrink-0 h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center">
-          <Bot className="h-5 w-5 text-primary" />
-        </div>
-      )}
-      
-      <div className={cn(
-        "flex flex-col space-y-2 max-w-[80%]",
-        isUser ? "items-end" : "items-start"
-      )}>
-        <div className={cn(
-          "px-4 py-2 rounded-lg shadow-sm",
-          isUser ? "bg-primary text-primary-foreground" : "bg-card border"
-        )}>
-          {message.content.split('\n').map((text, i) => (
-            <React.Fragment key={i}>
-              {text}
-              {i !== message.content.split('\n').length - 1 && <br />}
-            </React.Fragment>
-          ))}
-        </div>
-        
-        {/* Display tools if they exist */}
+    <div className={`flex ${isAssistant ? "justify-start" : "justify-end"}`}>
+      <div
+        className={`${
+          isAssistant
+            ? "bg-muted/60 text-foreground rounded-tl-sm"
+            : "bg-primary text-primary-foreground rounded-tr-sm"
+        } p-4 rounded-2xl max-w-[80%] overflow-hidden`}
+      >
+        {message.processedContent ? (
+          <div
+            className="prose dark:prose-invert prose-base max-w-none break-words overflow-hidden"
+            dangerouslySetInnerHTML={{ __html: message.processedContent }}
+          />
+        ) : (
+          <p className="whitespace-pre-wrap text-base break-words">
+            {message.content}
+          </p>
+        )}
+
+        {/* Display any tools information if available */}
         {message.tools && message.tools.length > 0 && (
-          <div className="mt-2 text-sm">
-            <ToolsDisplay tools={message.tools} />
+          <div className="mt-2 pt-2 border-t border-muted-foreground/20">
+            <p className="text-xs text-muted-foreground mb-1">Tools used:</p>
+            {message.tools.map((tool, idx) => (
+              <div key={idx} className="text-xs bg-background/50 p-1 rounded">
+                {tool.name}
+              </div>
+            ))}
           </div>
         )}
       </div>
-      
-      {isUser && (
-        <div className="flex-shrink-0 h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center">
-          <User className="h-5 w-5 text-primary" />
-        </div>
-      )}
-    </motion.div>
+    </div>
   );
-}
+};
+
+export default MessageBubble;
