@@ -9,7 +9,7 @@ import MessageBubble from "@/components/chat/MessageBubble";
 import { ToolsDisplay } from "@/components/chat/ToolsDisplay";
 import { useToast } from "@/hooks/use-toast";
 import { AnimatedLoadingDots } from "@/components/ui/animated-loading-dots";
-import { ApiKeyDialog } from "@/components/chat/ApiKeyDialog";
+// import { ApiKeyDialog } from "@/components/chat/ApiKeyDialog";
 import { remark } from "remark";
 import html from "remark-html";
 import remarkGfm from "remark-gfm";
@@ -376,11 +376,11 @@ export default function ChatInterface({
       </div>
 
       {/* API Key Dialog */}
-      <ApiKeyDialog
+      {/* <ApiKeyDialog
         open={showApiKeyDialog}
         onOpenChange={setShowApiKeyDialog}
         selectedModel={selectedModel}
-      />
+      /> */}
     </div>
   );
 }

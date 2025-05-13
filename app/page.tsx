@@ -215,7 +215,15 @@ export default function Home() {
 }
 
 // Feature Card Component
-function FeatureCard({ title, description, icon }) {
+function FeatureCard({
+  title,
+  description,
+  icon,
+}: {
+  title: string | any;
+  description: string | any;
+  icon: any;
+}) {
   return (
     <div className="bg-card p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 border border-border">
       <div className="mb-4">{icon}</div>

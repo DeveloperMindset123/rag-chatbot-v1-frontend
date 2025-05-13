@@ -21,6 +21,7 @@ export default function ChatPage() {
   useEffect(() => {
     // Check if the server is running
     const checkServerStatus = async () => {
+      // http://localhost:8000/ping
       try {
         const response = await fetch("http://localhost:8000/ping", {
           method: "GET",

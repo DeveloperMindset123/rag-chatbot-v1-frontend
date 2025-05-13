@@ -1,4 +1,4 @@
-import Message from "./message";
+import Message from "./Message";
 import { Message as MessageType } from "ai/react";
 
 interface Props {
